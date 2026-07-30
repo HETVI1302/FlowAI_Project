@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4" style="margin-top: 20px;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Analytics & <span class="text-gradient">Reports</span></h2>
+        <div>
+            <button class="btn btn-outline-light me-2"><i class="fa-solid fa-download me-2"></i>Export CSV</button>
+            <button class="btn btn-glow"><i class="fa-solid fa-file-pdf me-2"></i>Generate PDF</button>
+        </div>
+    </div>
+
+    <!-- Reports Filters -->
+    <div class="glass-panel p-3 mb-4">
+        <form class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label text-muted">Report Type</label>
+                <select class="form-select bg-dark border-secondary text-light">
+                    <option selected>Daily Traffic Report</option>
+                    <option>Weekly Analysis</option>
+                    <option>Monthly Overview</option>
+                    <option>Emission Statistics</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">Start Date</label>
+                <input type="date" class="form-control bg-dark border-secondary text-light">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-muted">End Date</label>
+                <input type="date" class="form-control bg-dark border-secondary text-light">
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-primary w-100">Filter Results</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row g-4">
+        <!-- Chart 1: Vehicle Type Distribution -->
+        <div class="col-md-6">
+            <div class="glass-panel p-4 h-100">
+                <h4 class="mb-4">Vehicle Type Distribution</h4>
+                <div style="height: 300px;">
+                    <canvas id="vehicleTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 2: Congestion History -->
+        <div class="col-md-6">
+            <div class="glass-panel p-4 h-100">
+                <h4 class="mb-4">Average Congestion History</h4>
+                <div style="height: 300px;">
+                    <canvas id="congestionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Vehicle Type Donut Chart
+    const vehicleCtx = document.getElementById('vehicleTypeChart').getContext('2d');
+    new Chart(vehicleCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Car', 'Motorcycle', 'Bus', 'Truck', 'Emergency'],
+            datasets: [{
+                data: [65, 15, 8, 10, 2],
+                backgroundColor: [
+                    '#3b82f6', // Primary blue
+                    '#8b5cf6', // Secondary purple
+                    '#f59e0b', // Warning yellow
+                    '#10b981', // Accent green
+                    '#ef4444'  // Danger red
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right', labels: { color: '#f8fafc' } }
+            },
+            cutout: '70%'
+        }
+    });
+
+    // Congestion Bar Chart
+    const congestionCtx = document.getElementById('congestionChart').getContext('2d');
+    new Chart(congestionCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Congestion Level (%)',
+                data: [45, 52, 48, 60, 75, 30, 25],
+                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#f8fafc' } } },
+            scales: {
+                y: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#94a3b8' } },
+                x: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#94a3b8' } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="d-flex align-items-center" style="min-height: 80vh; padding-top: 80px;">
+    <div class="container text-center">
+        <h1 class="display-3 fw-bold mb-4">Smart Traffic for <span class="text-gradient">Smarter Cities</span></h1>
+        <p class="lead mb-5 text-muted mx-auto" style="max-width: 700px;">
+            Harness the power of AI and Computer Vision to optimize traffic flow, reduce congestion, and build a sustainable future with FlowAI.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'dashboard' %}" class="btn btn-glow btn-lg">View Dashboard <i class="fa-solid fa-arrow-right ms-2"></i></a>
+            <a href="#about" class="btn btn-outline-light btn-lg" style="border-radius: 2rem;">Learn More</a>
+        </div>
+    </div>
+</section>
+
+<!-- Animated Statistics -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="glass-panel p-4">
+                    <h2 class="text-gradient display-5 fw-bold">98%</h2>
+                    <p class="text-muted mb-0">Detection Accuracy</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-panel p-4">
+                    <h2 class="text-gradient display-5 fw-bold">-35%</h2>
+                    <p class="text-muted mb-0">Wait Times Reduced</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-panel p-4">
+                    <h2 class="text-gradient display-5 fw-bold">24/7</h2>
+                    <p class="text-muted mb-0">Live Monitoring</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-panel p-4">
+                    <h2 class="text-gradient display-5 fw-bold">-20%</h2>
+                    <p class="text-muted mb-0">Carbon Emissions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-5 my-5">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold">Powerful <span class="text-gradient">Features</span></h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="glass-panel p-4 h-100 text-center">
+                    <div class="mb-3"><i class="fa-solid fa-camera stat-icon"></i></div>
+                    <h4>Live CV Tracking</h4>
+                    <p class="text-muted">Real-time object detection using YOLOv8 to classify and count vehicles accurately across intersections.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-panel p-4 h-100 text-center">
+                    <div class="mb-3"><i class="fa-solid fa-brain stat-icon"></i></div>
+                    <h4>AI Predictive Analytics</h4>
+                    <p class="text-muted">TensorFlow-powered forecasting to predict congestion and optimize signal timing proactively.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-panel p-4 h-100 text-center">
+                    <div class="mb-3"><i class="fa-solid fa-leaf stat-icon"></i></div>
+                    <h4>Emission Monitoring</h4>
+                    <p class="text-muted">Track fuel consumption and carbon footprints to meet sustainability and environmental goals.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="py-5 bg-darker">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <!-- Placeholder for Image or Graphic -->
+                <div class="glass-panel p-5 text-center" style="height: 400px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-city text-gradient" style="font-size: 8rem; opacity: 0.8;"></i>
+                </div>
+            </div>
+            <div class="col-md-6 ps-md-5">
+                <h2 class="fw-bold mb-4">About <span class="text-gradient">FlowAI</span></h2>
+                <p class="lead text-muted">FlowAI was developed specifically for the GTU AI Hackathon under the Smart Cities category. Our mission is to alleviate the growing burden of urban traffic.</p>
+                <p class="text-muted">By leveraging state-of-the-art computer vision models like YOLOv8 and predictive deep learning algorithms, FlowAI provides a seamless, dynamic, and automated solution to modern traffic management.</p>
+                <a href="#contact" class="btn btn-outline-light mt-3" style="border-radius: 2rem;">Contact Team</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="py-5 my-5">
+    <div class="container text-center max-w-md" style="max-width: 600px; margin: 0 auto;">
+        <h2 class="fw-bold mb-4">Get In <span class="text-gradient">Touch</span></h2>
+        <p class="text-muted mb-5">Interested in deploying FlowAI in your municipality? Reach out to our team.</p>
+        <form class="glass-panel p-4 text-start">
+            <div class="mb-3">
+                <label class="form-label text-muted">Name</label>
+                <input type="text" class="form-control bg-dark border-secondary text-light">
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted">Email</label>
+                <input type="email" class="form-control bg-dark border-secondary text-light">
+            </div>
+            <div class="mb-4">
+                <label class="form-label text-muted">Message</label>
+                <textarea class="form-control bg-dark border-secondary text-light" rows="4"></textarea>
+            </div>
+            <button type="submit" class="btn btn-glow w-100">Send Message</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4" style="margin-top: 20px;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Control <span class="text-gradient">Center</span></h2>
+        <div>
+            <span class="status-indicator status-active me-2"></span>
+            <span class="text-muted">System Active & Recording</span>
+        </div>
+    </div>
+
+    <!-- Top KPI Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="glass-panel stat-card">
+                <div>
+                    <div class="stat-label">Active Intersections</div>
+                    <div class="stat-value">12</div>
+                </div>
+                <div class="stat-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-panel stat-card">
+                <div>
+                    <div class="stat-label">Vehicles Detected</div>
+                    <div class="stat-value" id="val-total-vehicles">14,230</div>
+                </div>
+                <div class="stat-icon"><i class="fa-solid fa-car-side"></i></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-panel stat-card">
+                <div>
+                    <div class="stat-label">Avg Waiting Time</div>
+                    <div class="stat-value text-danger">4.2 <span class="fs-6">min</span></div>
+                </div>
+                <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-panel stat-card">
+                <div>
+                    <div class="stat-label">CO2 Emissions Reduced</div>
+                    <div class="stat-value text-success">850 <span class="fs-6">kg</span></div>
+                </div>
+                <div class="stat-icon"><i class="fa-solid fa-leaf"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Live Camera Feed (Simulated) -->
+        <div class="col-md-8">
+            <div class="glass-panel p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="mb-0">Live Camera Feed: <span class="text-gradient">Main St & 5th Ave</span></h4>
+                    <span class="badge bg-danger"><i class="fa-solid fa-video me-1"></i> LIVE</span>
+                </div>
+                <div class="ratio ratio-16x9 bg-darker rounded" style="border: 1px solid var(--glass-border); position: relative; overflow: hidden;">
+                    <!-- Placeholder for actual stream -->
+                    <div class="d-flex align-items-center justify-content-center h-100 flex-column text-muted">
+                        <i class="fa-solid fa-spinner fa-spin fa-3x mb-3 text-primary"></i>
+                        <p>Processing YOLOv8 Stream...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signal Status & Congestion -->
+        <div class="col-md-4">
+            <div class="row g-4 h-100">
+                <div class="col-12">
+                    <div class="glass-panel p-4 h-100 text-center">
+                        <h5 class="mb-4 text-start">Current Signal Status</h5>
+                        <div class="traffic-light-container mb-3">
+                            <div class="light-circle light-red"></div>
+                            <div class="light-circle light-yellow"></div>
+                            <div class="light-circle light-green active"></div>
+                        </div>
+                        <p class="mb-0 text-muted">Optimized by AI Model</p>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="glass-panel p-4 h-100">
+                        <h5 class="mb-3">Emergency Alerts</h5>
+                        <ul class="list-group list-group-flush bg-transparent">
+                            <li class="list-group-item bg-transparent text-light border-secondary px-0 d-flex justify-content-between">
+                                <span><i class="fa-solid fa-triangle-exclamation text-warning me-2"></i> Heavy Congestion (Route 9)</span>
+                                <small class="text-muted">2m ago</small>
+                            </li>
+                            <li class="list-group-item bg-transparent text-light border-secondary px-0 d-flex justify-content-between">
+                                <span><i class="fa-solid fa-truck-medical text-danger me-2"></i> Ambulance Detected (Priority given)</span>
+                                <small class="text-muted">15m ago</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="col-12 mt-4">
+            <div class="glass-panel p-4">
+                <h4 class="mb-4">Traffic Volume Trends</h4>
+                <div style="height: 300px;">
+                    <canvas id="trafficChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

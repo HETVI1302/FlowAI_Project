@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Notifications — FlowAI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 7rem; padding-bottom: 4rem;">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <span class="section-label">Notification Center</span>
+            <h2 class="fw-bold mt-1 mb-0">Alerts &amp; Notifications</h2>
+            <p class="text-muted small mb-0">
+                {{ unread_count }} unread of {{ notifications|length }} shown
+            </p>
+        </div>
+        {% if unread_count %}
+        <form method="post" action="{% url 'notifications:mark_all_read' %}">
+            {% csrf_token %}
+            <button class="btn btn-outline-glass btn-sm" type="submit">
+                <i class="fa-solid fa-check-double me-1"></i> Mark all as read
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="glass-card p-0">
+        {% for n in notifications %}
+        <div class="notif-row d-flex justify-content-between align-items-start gap-3 p-3 {% if not n.is_read %}unread{% endif %}"
+             {% if not forloop.last %}style="border-bottom: 1px solid rgba(148,163,184,0.1);"{% endif %}>
+            <div>
+                <span class="notif-priority notif-priority-{{ n.priority }}">{{ n.get_priority_display }}</span>
+                <span class="text-muted small ms-2">{{ n.get_category_display }}</span>
+                <div class="fw-semibold mt-1">{{ n.title }}</div>
+                <div class="small text-muted">{{ n.message }}</div>
+                <div class="text-muted mt-1" style="font-size: 0.7rem;">
+                    {% if n.intersection %}{{ n.intersection.name }} &middot; {% endif %}{{ n.created_at|timesince }} ago
+                </div>
+            </div>
+            {% if not n.is_read %}
+            <form method="post" action="{% url 'notifications:mark_read' n.id %}">
+                {% csrf_token %}
+                <button class="btn btn-outline-glass btn-sm" type="submit" title="Mark as read">
+                    <i class="fa-solid fa-check"></i>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="p-5 text-center">
+            <p class="text-muted mb-0">No notifications yet — you'll see congestion, accident, and emergency alerts here as they come in.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

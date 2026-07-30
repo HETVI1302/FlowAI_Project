@@ -1,0 +1,11 @@
+.analytics-table thead th {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+.analytics-table tbody tr {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+.analytics-table tbody tr:last-child { border-bottom: none; }

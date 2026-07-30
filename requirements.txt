@@ -1,0 +1,39 @@
+# --- Core ---
+Django==5.0.6
+django-environ==0.11.2
+
+# --- REST API + Auth ---
+djangorestframework==3.15.1
+djangorestframework-simplejwt==5.3.1
+django-cors-headers==4.3.1
+django-filter==24.2
+
+# --- Real-time (WebSockets) ---
+channels==4.1.0
+channels-redis==4.2.0
+daphne==4.1.2
+
+# --- Cache / broker ---
+redis==5.0.4
+django-redis==5.4.0
+
+# --- Database ---
+mysqlclient==2.2.4
+
+# --- Demo data ---
+Faker==25.2.0
+
+# --- Report generation (reports app, Phase 7) ---
+openpyxl==3.1.2
+reportlab==4.2.0
+
+# --- AI / Computer Vision (wired up in Phase 3 — monitoring app) ---
+opencv-python-headless==4.9.0.80
+ultralytics==8.2.18          # YOLOv8
+numpy==1.26.4
+pandas==2.2.2
+tensorflow==2.16.1
+
+# --- Production server ---
+gunicorn==22.0.0
+uvicorn[standard]==0.29.0

@@ -1,0 +1,41 @@
+/* Signal mode pills — control panel + notification-triggered highlight */
+.signal-mode-pill {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.signal-mode-fixed { background: rgba(148, 163, 184, 0.12); color: #94a3b8; }
+.signal-mode-dynamic { background: rgba(34, 211, 238, 0.12); color: var(--accent-cyan); border: 1px solid rgba(34, 211, 238, 0.3); }
+.signal-mode-manual { background: rgba(129, 140, 248, 0.12); color: var(--accent-violet); border: 1px solid rgba(129, 140, 248, 0.3); }
+.signal-mode-emergency {
+    background: rgba(239, 68, 68, 0.14);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    animation: signal-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes signal-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.35); }
+    50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+
+.signal-timing-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.15);
+    overflow: hidden;
+    display: flex;
+}
+.signal-timing-bar .green { background: var(--accent-green); }
+.signal-timing-bar .yellow { background: #facc15; }
+.signal-timing-bar .red { background: #ef4444; }
+
+.signal-card.just-updated {
+    animation: signal-flash 1s ease-out;
+}
+@keyframes signal-flash {
+    0% { background: rgba(34, 211, 238, 0.15); }
+    100% { background: transparent; }
+}

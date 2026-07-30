@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dashboard — FlowAI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/monitoring.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 7rem; padding-bottom: 4rem;">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <span class="section-label">Control Room</span>
+            <h2 class="fw-bold mt-1 mb-0">Welcome back, {{ user.get_full_name|default:user.username }}</h2>
+            <p class="text-muted small mb-0">Role: <span class="brand-accent text-uppercase">{{ user.role }}</span></p>
+        </div>
+        <span class="badge-glass" id="socket-status">
+            <i class="fa-solid fa-circle-notch fa-spin me-1"></i> Connecting…
+        </span>
+    </div>
+
+    <div id="emergency-alert-banner" class="glass-card p-3 mb-4 d-none" style="border-color: rgba(239,68,68,0.5);">
+        <i class="fa-solid fa-triangle-exclamation me-2" style="color: #ef4444;"></i>
+        <span id="emergency-alert-text"></span>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center h-100">
+                <div class="stat-number" id="stat-active-intersections">{{ active_intersections_count }}</div>
+                <div class="text-muted small mt-1">Active Intersections</div>
+                <div class="text-muted" style="font-size: 0.7rem;">of {{ total_intersections_count }} total</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center h-100">
+                <div class="stat-number" id="stat-total-vehicles">{{ total_vehicles_today }}</div>
+                <div class="text-muted small mt-1">Vehicles Detected Today</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center h-100">
+                <div class="stat-number" id="stat-waiting-time">{{ avg_waiting_time }}</div>
+                <div class="text-muted small mt-1">Avg Waiting Time (s)</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center h-100">
+                <span class="congestion-badge congestion-{{ overall_congestion_level }} fs-6" id="stat-congestion-level">
+                    {{ overall_congestion_level|capfirst }}
+                </span>
+                <div class="text-muted small mt-2">City-wide Congestion</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="glass-card p-4 text-center h-100">
+                <div class="stat-number">{{ emissions_today.total_carbon|default:"0"|floatformat:1 }}<span class="fs-6"> kg</span></div>
+                <div class="text-muted small mt-1">Carbon Emissions Today</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="glass-card p-4 text-center h-100">
+                <div class="stat-number">{{ emissions_today.total_fuel|default:"0"|floatformat:1 }}<span class="fs-6"> L</span></div>
+                <div class="text-muted small mt-1">Fuel Consumption Today</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="glass-card p-4 h-100">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-line me-2"></i>Vehicle Count Trend</h6>
+                <div style="position: relative; height: 280px; width: 100%;">
+    <canvas id="trendChart"></canvas>
+</div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="glass-card p-4 h-100">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-simple me-2"></i>Congestion by Intersection</h6>
+                <div style="position: relative; height: 280px; width: 100%;">
+    <canvas id="congestionChart"></canvas>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Signal status -->
+        <div class="col-lg-5">
+            <div class="glass-card p-4 h-100">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-traffic-light me-2"></i>Signal Status</h6>
+                {% if signals %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0" style="color: var(--text-soft);">
+                        <thead class="text-muted small">
+                            <tr><th>Intersection</th><th>Mode</th><th>Cycle (s)</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for signal in signals %}
+                            <tr>
+                                <td>{{ signal.intersection.name }}</td>
+                                <td class="text-capitalize">{{ signal.mode }}</td>
+                                <td>{{ signal.cycle_length }}</td>
+                                <td>
+                                    {% if signal.is_active %}
+                                        <span class="camera-status camera-status-online">Active</span>
+                                    {% else %}
+                                        <span class="camera-status camera-status-offline">Inactive</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted small mb-0">No signals configured yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0"><i class="fa-solid fa-bell me-2"></i>Alerts</h6>
+                    {% if unread_notification_count %}
+                        <span class="badge-glass">{{ unread_notification_count }} unread</span>
+                    {% endif %}
+                </div>
+                {% if notifications %}
+                <ul class="list-unstyled small mb-0" id="notification-list">
+                    {% for n in notifications %}
+                    <li class="mb-2 pb-2 {% if not forloop.last %}border-bottom{% endif %}" style="border-color: var(--border-glass) !important;">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-semibold">{{ n.title }}</span>
+                            <span class="text-muted" style="font-size: 0.7rem;">{{ n.created_at|timesince }} ago</span>
+                        </div>
+                        <div class="text-muted">{{ n.message|truncatechars:80 }}</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted small mb-0">No alerts yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Reports -->
+        <div class="col-lg-3">
+            <div class="glass-card p-4 h-100">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-file-lines me-2"></i>Daily Reports</h6>
+                {% if recent_reports %}
+                <ul class="list-unstyled small mb-0">
+                    {% for report in recent_reports %}
+                    <li class="mb-2">
+                        <div class="fw-semibold">{{ report.get_report_type_display }}</div>
+                        <div class="text-muted">{{ report.period_start }} → {{ report.period_end }}</div>
+                        {% if report.file %}
+                            <a href="{{ report.file.url }}" class="brand-accent">Download {{ report.get_file_format_display }}</a>
+                        {% else %}
+                            <span class="text-muted">{{ report.get_status_display }}</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted small mb-0">No reports generated yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+{{ trend_chart_json|json_script:"trend-chart-data" }}
+{{ congestion_chart_json|json_script:"congestion-chart-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<script>
+console.log("Chart loaded:", typeof Chart);
+</script>
+
+<script src="{% static 'js/dashboard.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Analytics — FlowAI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/analytics.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 7rem; padding-bottom: 4rem;">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <span class="section-label">Insights</span>
+            <h2 class="fw-bold mt-1 mb-0">Analytics &amp; Environmental Monitoring</h2>
+            <p class="text-muted small mb-0">Traffic statistics and emissions estimates, rolled up per intersection.</p>
+        </div>
+        <a href="{% url 'reports:list' %}" class="btn btn-outline-glass btn-sm">
+            <i class="fa-solid fa-file-export me-1"></i> Reports
+        </a>
+    </div>
+
+    <!-- Period selector -->
+    <div class="btn-group mb-4" role="group">
+        {% for value, label in period_choices %}
+        <a href="?period={{ value }}" class="btn btn-sm {% if period == value %}btn-gradient{% else %}btn-outline-glass{% endif %}">{{ label }}</a>
+        {% endfor %}
+    </div>
+
+    <!-- Emissions summary cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center h-100">
+                <div class="stat-number">{{ emissions_today.total_carbon|default:"0"|floatformat:1 }}<span class="fs-6"> kg</span></div>
+                <div class="text-muted small mt-1">CO2 Today</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center h-100">
+                <div class="stat-number">{{ emissions_today.total_fuel|default:"0"|floatformat:1 }}<span class="fs-6"> L</span></div>
+                <div class="text-muted small mt-1">Fuel Today</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center h-100">
+                <div class="stat-number">{{ emissions_week.total_carbon|default:"0"|floatformat:1 }}<span class="fs-6"> kg</span></div>
+                <div class="text-muted small mt-1">CO2 This Week</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center h-100">
+                <div class="stat-number">{{ emissions_week.total_fuel|default:"0"|floatformat:1 }}<span class="fs-6"> L</span></div>
+                <div class="text-muted small mt-1">Fuel This Week</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="glass-card p-4 h-100">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-column me-2"></i>Vehicle Volume by Intersection</h6>
+                <canvas id="volumeChart" height="220"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="glass-card p-4 h-100">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-leaf me-2"></i>Carbon Emissions — Last 14 Days</h6>
+                <canvas id="emissionsChart" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Per-intersection table -->
+    <div class="glass-card p-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-table me-2"></i>Per-Intersection Breakdown</h6>
+        <div class="table-responsive">
+            <table class="table table-dark table-borderless align-middle analytics-table">
+                <thead>
+                    <tr>
+                        <th>Intersection</th>
+                        <th>Total Vehicles</th>
+                        <th>Congestion</th>
+                        <th>Avg Waiting Time</th>
+                        <th>Peak Hour</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for card in cards %}
+                    <tr>
+                        <td>{{ card.intersection.name }}</td>
+                        {% if card.statistic %}
+                            <td>{{ card.statistic.total_vehicles }}</td>
+                            <td><span class="congestion-badge congestion-{{ card.congestion_label|lower }}">{{ card.congestion_label }}</span></td>
+                            <td>{{ card.statistic.avg_waiting_time_seconds|floatformat:1 }}s</td>
+                            <td>{% if card.statistic.peak_hour != None %}{{ card.statistic.peak_hour }}:00{% else %}—{% endif %}</td>
+                        {% else %}
+                            <td colspan="4" class="text-muted">No data for this period yet</td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-muted text-center py-4">No intersections configured yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script id="volume-chart-data" type="application/json">
+{{ volume_chart_json|safe }}
+</script>
+
+<script id="emissions-chart-data" type="application/json">
+{{ emissions_chart_json|safe }}
+</script>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/analytics.js' %}"></script>
+{% endblock %}

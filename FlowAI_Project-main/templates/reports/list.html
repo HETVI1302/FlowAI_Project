@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Reports — FlowAI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/reports.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 7rem; padding-bottom: 4rem;">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <span class="section-label">Analytics</span>
+            <h2 class="fw-bold mt-1 mb-0">Reports</h2>
+            <p class="text-muted small mb-0">Generate and download daily, weekly, or monthly traffic &amp; emissions reports.</p>
+        </div>
+        <a href="{% url 'analytics:dashboard' %}" class="btn btn-outline-glass btn-sm">
+            <i class="fa-solid fa-chart-line me-1"></i> Analytics
+        </a>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="glass-card p-3 mb-3 {% if message.tags == 'error' %}text-danger{% else %}text-success{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Request a new report -->
+    <div class="glass-card p-4 mb-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-plus me-2"></i>Generate a New Report</h6>
+        <form method="post" action="{% url 'reports:request' %}" class="row g-3">
+            {% csrf_token %}
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Intersection</label>
+                <select name="intersection_id" class="form-select form-select-sm bg-transparent text-light">
+                    <option value="">City-wide (all)</option>
+                    {% for intersection in intersections %}
+                    <option value="{{ intersection.id }}">{{ intersection.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Type</label>
+                <select name="report_type" class="form-select form-select-sm bg-transparent text-light">
+                    {% for value, label in report_types %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Format</label>
+                <select name="file_format" class="form-select form-select-sm bg-transparent text-light">
+                    {% for value, label in formats %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">From</label>
+                <input type="date" name="period_start" class="form-control form-control-sm bg-transparent text-light" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">To</label>
+                <input type="date" name="period_end" class="form-control form-control-sm bg-transparent text-light" required>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-gradient btn-sm w-100">Generate</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Report history -->
+    <div class="glass-card p-4">
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left me-2"></i>Recent Reports</h6>
+        <div class="table-responsive">
+            <table class="table table-dark table-borderless align-middle reports-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Scope</th>
+                        <th>Format</th>
+                        <th>Period</th>
+                        <th>Status</th>
+                        <th>Requested By</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td>{{ report.get_report_type_display }}</td>
+                        <td>{{ report.intersection.name|default:"City-wide" }}</td>
+                        <td class="text-uppercase">{{ report.file_format }}</td>
+                        <td>{{ report.period_start }} → {{ report.period_end }}</td>
+                        <td><span class="report-status report-status-{{ report.status }}">{{ report.get_status_display }}</span></td>
+                        <td class="text-muted">{{ report.generated_by.username|default:"—" }}</td>
+                        <td>
+                            {% if report.status == 'ready' %}
+                            <a href="{% url 'reports:download' report.id %}" class="btn btn-outline-glass btn-sm">
+                                <i class="fa-solid fa-download me-1"></i> Download
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-muted text-center py-4">No reports generated yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
